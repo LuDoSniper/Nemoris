@@ -23,14 +23,6 @@ lint:
   script:
     - python tools/lint.py
   rules:
-    - changes:
-        - "**/*.gd"
-        - "**/*.py"
-        - "**/*.php"
-        - "**/*.sh"
-        - ".editorconfig"
-        - ".pre-commit-config.yaml"
-        - "requirements-dev.txt"
-        - "tools/**"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH
+  allow_failure: false

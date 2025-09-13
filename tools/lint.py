@@ -5,9 +5,32 @@ import shutil
 import pathlib
 from typing import Iterable, List
 
+
+def _reconfigure_streams_utf8() -> None:
+    try:
+        getattr(sys.stdout, "reconfigure", lambda **kwargs: None)(
+            encoding="utf-8", errors="replace"
+        )
+        getattr(sys.stderr, "reconfigure", lambda **kwargs: None)(
+            encoding="utf-8", errors="replace"
+        )
+    except Exception:
+        pass
+
+
+_reconfigure_streams_utf8()
+
+
+def _tick() -> str:
+    enc = (sys.stdout.encoding or "").lower()
+    return "✓" if "utf" in enc else "OK"
+
+
 INCLUDE_DIRS = ["."]
 SKIP_DIRS = {
     ".git",
+    ".github",
+    ".gitlab",
     "node_modules",
     "vendor",
     ".venv",
@@ -40,7 +63,8 @@ def collect(exts: Iterable[str]) -> List[str]:
     out: List[str] = []
     for base in INCLUDE_DIRS:
         for root, _, files in os.walk(base):
-            if any(skip in root for skip in SKIP_DIRS):
+            parts = pathlib.Path(root).parts
+            if any(p in SKIP_DIRS for p in parts):
                 continue
             for n in files:
                 p = pathlib.Path(n)
@@ -84,7 +108,7 @@ def warn(msg: str):
 
 
 def ok(msg: str):
-    print(f"[✓] {msg}")
+    print(f"[{_tick()}] {msg}")
 
 
 # ---------- main ----------
@@ -174,19 +198,20 @@ def main():
 
     # --- EditorConfig checker ---
     section("EditorConfig")
-    ec_bin = None
-    if which("editorconfig-checker"):
-        ec_bin = "editorconfig-checker"
-    elif which("ec"):
-        ec_bin = "ec"
-
+    ec_bin = (
+        "editorconfig-checker"
+        if which("editorconfig-checker")
+        else ("ec" if which("ec") else None)
+    )
     if ec_bin:
-        exclude = r"(^|/)(\.git|\.venv|\.mypy_cache|\.ruff_cache|\.godot|\.import|node_modules|vendor|build|dist)(/|$)"
-        rc |= run([ec_bin, "-exclude", exclude])
+        if pathlib.Path(".editorconfig-checker.json").exists():
+            rc |= run([ec_bin])  # la config est lue automatiquement
+        else:
+            exclude = r"(^|/)(\.git|\.github|\.gitlab|\.venv|\.mypy_cache|\.ruff_cache|\.godot|\.import|node_modules|vendor|build|dist|\.vscode|\.idea)(/|$)"
+            rc |= run([ec_bin, "-exclude", exclude])
     else:
         info(
-            "editorconfig-checker non installé (contrôle ignoré). "
-            "Installe via: pip install editorconfig-checker"
+            "editorconfig-checker non installé (contrôle ignoré). Installe via: pip install -r requirements-dev.txt"
         )
 
     # --- Summary ---
