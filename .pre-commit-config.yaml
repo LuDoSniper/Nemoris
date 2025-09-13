@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: repo-lint
         name: repo-lint (tools/lint.py)
-        entry: python tools/lint.py
+        entry: python -X utf8 tools/lint.py
         language: system
         pass_filenames: false
-        stages: [commit, push]
+        stages: [pre-commit, pre-push]

@@ -174,15 +174,20 @@ def main():
 
     # --- EditorConfig checker ---
     section("EditorConfig")
-    ec_bin = (
-        "editorconfig-checker"
-        if which("editorconfig-checker")
-        else ("ec" if which("ec") else None)
-    )
+    ec_bin = None
+    if which("editorconfig-checker"):
+        ec_bin = "editorconfig-checker"
+    elif which("ec"):
+        ec_bin = "ec"
+
     if ec_bin:
-        rc |= run([ec_bin])
+        exclude = r"(^|/)(\.git|\.venv|\.mypy_cache|\.ruff_cache|\.godot|\.import|node_modules|vendor|build|dist)(/|$)"
+        rc |= run([ec_bin, "-exclude", exclude])
     else:
-        info("editorconfig-checker non installé (pip install editorconfig-checker).")
+        info(
+            "editorconfig-checker non installé (contrôle ignoré). "
+            "Installe via: pip install editorconfig-checker"
+        )
 
     # --- Summary ---
     section("Résumé")
