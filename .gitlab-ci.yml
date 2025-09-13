@@ -1,0 +1,28 @@
+stages: [lint]
+
+default:
+  image: python:3.11-slim
+  interruptible: true
+  cache:
+    key: "pip-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - ~/.cache/pip
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends shellcheck shfmt
+    - python -m pip install --upgrade pip
+    - pip install -r requirements-dev.txt
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+lint:
+  stage: lint
+  script:
+    - python tools/lint.py
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+  allow_failure: false
