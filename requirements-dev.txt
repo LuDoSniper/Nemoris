@@ -1,0 +1,5 @@
+gdtoolkit==4.*
+pre-commit
+ruff
+mypy
+editorconfig-checker

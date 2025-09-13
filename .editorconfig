@@ -1,0 +1,61 @@
+# Racine
+root = true
+
+# Valeurs par défaut (s'appliquent à tout)
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Textes / configs génériques (2 espaces)
+[*.{js,ts,jsx,tsx,json,yml,yaml,md,html,css,scss,ini,xml}]
+indent_style = space
+indent_size = 2
+
+# PHP (PSR-12)
+[*.php]
+indent_style = space
+indent_size = 4
+
+# Python (PEP-8)
+[*.py]
+indent_style = space
+indent_size = 4
+
+# Shell / Docker
+[*.{sh,bash}]
+indent_style = space
+indent_size = 2
+
+[Dockerfile]
+indent_style = space
+indent_size = 2
+
+# Makefile : tabs obligatoires
+[Makefile]
+indent_style = tab
+
+# Exceptions Markdown : ne pas supprimer certains espaces
+[*.md]
+trim_trailing_whitespace = false
+
+# Patches / diff (conserver exactement)
+[*.{patch,diff}]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+# GDScript (tabs, width 4)
+[*.gd]
+indent_style = tab
+tab_width = 4
+
+# Shaders Godot 4
+[*.gdshader]
+indent_style = tab
+tab_width = 4
+
+# Scènes & resources (lisibilité)
+[*.{tscn,tres}]
+indent_style = space
+indent_size = 2
